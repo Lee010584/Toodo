@@ -46,6 +46,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 h2{font-size:17px;margin:18px 0 10px}
 h2 small{color:var(--hol);font-weight:500;font-size:14px}
 .add{display:flex;gap:8px;margin-bottom:12px}
+input[type=time]{width:112px;padding:10px 8px;font-size:16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text)}
 input[type=text]{flex:1;min-width:0;padding:12px 14px;font-size:16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text)}
 input[type=text]:focus{outline:2px solid var(--accent)}
 .addbtn{padding:0 18px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:600}
@@ -83,7 +84,7 @@ li.cd .dl:not(.late){color:hsl(var(--h) 70% 38%)}
 </div>
 <div class="cal"><div class="grid" id="grid"></div></div>
 <h2 id="seltitle"></h2>
-<div class="add"><input type="text" id="in" placeholder="新增這一天的待辦…" maxlength="100"><button class="addbtn" id="add">新增</button></div>
+<div class="add"><input type="text" id="in" placeholder="新增這一天的待辦…" maxlength="100"><input type="time" id="tm" aria-label="提醒時間"><button class="addbtn" id="add">新增</button></div>
 <ul id="list"></ul>
 <div class="foot" id="foot"></div>
 </div>
@@ -107,6 +108,23 @@ function fmt(k){var d=parse(k);return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d
 var now=new Date(),todayKey=key(now),sel=todayKey,view=new Date(now.getFullYear(),now.getMonth(),1),ov=null;
 function $(i){return document.getElementById(i)}
 
+function ics(t){
+  function z(n){return String(n).padStart(2,"0")}
+  var p=t.date.split("-"),tm=(t.time||"09:00").split(":");
+  var st=p[0]+p[1]+p[2]+"T"+tm[0]+tm[1]+"00";
+  var d=new Date(+p[0],+p[1]-1,+p[2],+tm[0],+tm[1]+30);
+  var en=d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+"T"+z(d.getHours())+z(d.getMinutes())+"00";
+  var tx=t.text.replace(/[\\;,]/g,function(m){return "\\"+m});
+  var stamp=new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z";
+  var s=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//todo//TW","BEGIN:VEVENT","UID:"+Date.now()+"@todo","DTSTAMP:"+stamp,"DTSTART:"+st,"DTEND:"+en,"SUMMARY:"+tx,
+    "BEGIN:VALARM","TRIGGER:-P1D","ACTION:DISPLAY","DESCRIPTION:明天到期："+tx,"END:VALARM",
+    
+    "END:VEVENT","END:VCALENDAR"].join("\r\n");
+  try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([s],{type:"text/calendar"}));a.download="reminder.ics";document.body.appendChild(a);a.click();a.remove()}catch(e){}
+}
+function bell(t){
+  var b=document.createElement("button");b.className="mv";b.textContent="🔔";b.setAttribute("aria-label","加入 iPhone 提醒");b.onclick=function(){ics(t)};return b;
+}
 function edit(t,s){
   var i=document.createElement("input");i.type="text";i.value=t.text;i.maxLength=100;
   i.style.cssText="width:100%;height:auto;flex:1;padding:6px 8px;font-size:16px";
@@ -154,7 +172,7 @@ function mkItem(t,showDate){
   var c=document.createElement("input");c.type="checkbox";c.checked=t.done;
   c.onchange=function(){t.done=c.checked;save();render()};
   var w=document.createElement("div");w.className="tx";
-  var s=document.createElement("span");s.textContent=t.text;w.appendChild(s);s.onclick=function(){edit(t,s)};
+  var s=document.createElement("span");s.textContent=(t.time?"⏰"+t.time+" ":"")+t.text;w.appendChild(s);s.onclick=function(){edit(t,s)};
   if(showDate){
     var b=document.createElement("button");var late=!t.done&&t.date<todayKey;
     b.className="dl"+(late?" late":"");b.textContent=fmt(t.date)+(late?" · 已逾期":"");
@@ -169,10 +187,10 @@ function mkItem(t,showDate){
     var dn=document.createElement("button");dn.className="mv";dn.textContent="▼";dn.setAttribute("aria-label","下移");dn.disabled=idx===sib.length-1;dn.onclick=function(){mv(t,1)};
     var h=document.createElement("button");h.className="mv hd";h.textContent="≡";h.setAttribute("aria-label","拖曳排序");
     li._t=t;drag(h,li,t);
-    li.append(c,w,h,x);
+    li.append.apply(li,t.done?[c,w,h,x]:[c,w,bell(t),h,x]);
   }else{
     if(!t.done){li.style.setProperty("--h",hue(t.date));li.className+=" cd"}
-    li.append(c,w,x);
+    li.append.apply(li,t.done?[c,w,x]:[c,w,bell(t),x]);
   }
   return li;
 }
@@ -228,7 +246,7 @@ function render(){
 function add(){
   var i=$("in"),v=i.value.trim();
   if(!v)return;
-  todos.push({text:v,done:false,date:sel});i.value="";save();render();i.focus();
+  todos.push({text:v,done:false,date:sel,time:$("tm").value||""});$("tm").value="";i.value="";save();render();i.focus();
 }
 $("add").onclick=add;
 $("in").onkeydown=function(e){if(e.key==="Enter")add()};
