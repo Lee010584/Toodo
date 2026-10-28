@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="待辦行事曆">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#3b6ef5">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADLElEQVR42u3dwVHbQBSAYVvDiQbSQZqABjjTB9RCIZzdAFXQQQqAc24MA5bHtnalfe99/y0Jk5F3P54kEHh/9/Sxk441WQLBITgEh+AQHIJDcAgOwSE4JDgEh+AQHIJDcAgOwSE4BIcEh+AQHIJDcAgOjd1N3EN/e7n9/sf750/HZnIcWf2jf+PYKuKYW+sR9mDkY8uP4/Qqb7sHIx+bC1LBITgEh+AQHErTKF8hfX1/PPtjD+3+q+Y1O7bHv6/VcWy6kUP3tTIbKpnIiKKkyuTA4orlWn+ETGQYIaPgICPQ6rmV1Rg4jI1YaziFe1X/Hh6u/tferXNsq/kIeVqZW+VtZYx/bFWuOX6v9TirP/KxXdR+nTfjcbXRvBW+7OFuRXAIDsEhOASH4BAcgkNwCA4JDsEhOASH4BAcCtJKP/H253Cw1o3r/+srTQ7BITgEh+AQHIJDcAgOwSE4JDgEh+AQHIIjW0HfMRSOlWSE9gFH95lx//zpTYd16mwS0Qcc611nhPMBx6pXoLFOMXBscG8SxQccG9y1RnnfcjjIgIMMOEYulgw41hsb4WTAQQYcZMBBBhxkwEEGHCll5AiOLjISjI08OHp/TheUkQRH7wfyasrIgOPHA3lkwDG7c219VJYRG8fczrXyUVxGYBynd265DzKi4jhn55b4ICMqjt6PapIRFcel+93143PLiIfjiv3oNGnSywh5Wunkg4wkF6Rd5wcZ4W9l2/oo9Y34/Dga+iAjIY4mPshIi2OhDzKS47jaBxklcHTdv7IydpkeE6y8i3Bs4KM4uGwPGDfcTqMo4dPnTTaVjF3WH01YuLVkZMaxZIPJyI/jum0mowqOSzebjFo4zt9yMiriOGfjyaiL42v7fyN4e7klY66bOi91zoeqTw7BoYA4qv1OnBzraXIIDo2Mw5kl3EqaHBoDh+ERaw2nxK+NDKcVJcJheERZt/3d08dWr9a3OQb/dJoKvmYyAkwOI2TwT54hcFAy5kAdC4eq360IDsEhOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQ3AIDsEhOASH4BAcgkOCQ3AIDsEhOASHwvQfA149vgl5qdkAAAAASUVORK5CYII=">
+<title>行事曆待辦清單</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--text:#1f2328;--muted:#8a8f98;--accent:#3b6ef5;--soft:#e8eefe;--line:#e6e4de;--danger:#d64545;--hol:#d64545;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--card:#222428;--text:#eceef1;--muted:#8d939c;--accent:#6d93ff;--soft:#2a3350;--line:#33363c;--danger:#ff7a7a;--hol:#ff7a7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17181b;--card:#222428;--text:#eceef1;--muted:#8d939c;--accent:#6d93ff;--soft:#2a3350;--line:#33363c;--danger:#ff7a7a;--hol:#ff7a7a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+main{max-width:520px;margin:0 auto;padding:16px 14px 48px}
+button{font:inherit;cursor:pointer;color:inherit}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sum button{display:flex;align-items:baseline;justify-content:center;gap:8px;padding:12px;border:1px solid var(--line);background:var(--card);border-radius:14px;font-size:15px}
+.sum b{font-size:24px}
+.sum button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.head h1{font-size:22px;margin:0}
+.nav{display:flex;gap:6px}
+.nav button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 12px;font-size:15px}
+.cal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.wd{text-align:center;font-size:12px;color:var(--muted);padding:6px 0}
+.day{min-height:60px;border:0;background:rgba(128,128,128,.09);border-radius:10px;display:flex;flex-direction:column;align-items:center;padding:5px 0 0;font-size:15px}
+.day.out{opacity:.4}
+.day.hol{background:rgba(214,69,69,.15)}.day.hol .n{color:var(--hol)}
+.day.today .n{background:var(--accent);color:#fff;border-radius:50%}
+.day.sel{background:var(--soft);outline:2px solid var(--accent);outline-offset:-2px}
+.n{width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.hl{font-size:10px;line-height:12px;color:var(--hol);margin-top:1px;white-space:nowrap}
+.hl.mk{opacity:.7}
+.dots{display:flex;gap:3px;margin-top:3px;height:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.dot.d{background:var(--muted);opacity:.5}
+h2{font-size:17px;margin:18px 0 10px}
+h2 small{color:var(--hol);font-weight:500;font-size:14px}
+.add{display:flex;gap:8px;margin-bottom:12px}
+input[type=text]{flex:1;min-width:0;padding:12px 14px;font-size:16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text)}
+input[type=text]:focus{outline:2px solid var(--accent)}
+.addbtn{padding:0 18px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:600}
+ul{list-style:none;margin:0;padding:0;background:var(--card);border-radius:14px;border:1px solid var(--line)}
+li{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:0}
+li input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+li .tx{flex:1;min-width:0}
+li .tx span{word-break:break-word}
+li.done .tx span{text-decoration:line-through;color:var(--muted)}
+.dl{display:block;border:0;background:transparent;padding:2px 0 0;font-size:13px;color:var(--accent)}
+.dl.late{color:var(--danger)}
+.del{border:0;background:transparent;color:var(--danger);font-size:20px;line-height:1;padding:4px 8px}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.foot{margin-top:10px;color:var(--muted);font-size:14px}
+.back{border:0;background:transparent;color:var(--accent);font-size:15px;padding:4px 0;margin-bottom:4px}
+</style>
+</head>
+<body>
+<main>
+<div class="sum"><button id="sp"><b id="np">0</b>未完成</button><button id="sd"><b id="nd">0</b>已完成</button></div>
+
+<div id="calview">
+<div class="head">
+<h1 id="title"></h1>
+<div class="nav"><button id="prev" aria-label="上個月">‹</button><button id="today">今天</button><button id="next" aria-label="下個月">›</button></div>
+</div>
+<div class="cal"><div class="grid" id="grid"></div></div>
+<h2 id="seltitle"></h2>
+<div class="add"><input type="text" id="in" placeholder="新增這一天的待辦…" maxlength="100"><button class="addbtn" id="add">新增</button></div>
+<ul id="list"></ul>
+<div class="foot" id="foot"></div>
+</div>
+
+<div id="ovview" hidden>
+<button class="back" id="back">‹ 返回行事曆</button>
+<h2 id="ovtitle" style="margin-top:4px"></h2>
+<ul id="ovlist"></ul>
+</div>
+</main>
+<script>
+var H={"2026-01-01":"元旦","2026-02-15":"小年夜","2026-02-16":"除夕","2026-02-17":"初一","2026-02-18":"初二","2026-02-19":"初三","2026-02-20":"補假","2026-02-27":"補假","2026-02-28":"和平日","2026-04-03":"補假","2026-04-04":"兒童節","2026-04-05":"清明","2026-04-06":"補假","2026-05-01":"勞動節","2026-06-19":"端午","2026-09-25":"中秋","2026-09-28":"教師節","2026-10-09":"補假","2026-10-10":"國慶日","2026-10-25":"光復節","2026-10-26":"補假","2026-12-25":"行憲日",
+"2027-01-01":"元旦","2027-02-04":"小年夜","2027-02-05":"除夕","2027-02-06":"初一","2027-02-07":"初二","2027-02-08":"初三","2027-02-09":"補假","2027-02-10":"補假","2027-02-28":"和平日","2027-03-01":"補假","2027-04-04":"兒童節","2027-04-05":"清明","2027-04-06":"補假","2027-04-30":"補假","2027-05-01":"勞動節","2027-06-09":"端午","2027-09-15":"中秋","2027-09-28":"教師節","2027-10-10":"國慶日","2027-10-11":"補假","2027-10-25":"光復節","2027-12-24":"補假","2027-12-25":"行憲日","2027-12-31":"補假"};
+var todos=[];
+try{todos=JSON.parse(localStorage.getItem("cal-todos")||"[]")}catch(e){todos=[]}
+function save(){try{localStorage.setItem("cal-todos",JSON.stringify(todos))}catch(e){}}
+function key(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parse(k){var p=k.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+var WD=["日","一","二","三","四","五","六"];
+function fmt(k){var d=parse(k);return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+"（週"+WD[d.getDay()]+"）"}
+var now=new Date(),todayKey=key(now),sel=todayKey,view=new Date(now.getFullYear(),now.getMonth(),1),ov=null;
+function $(i){return document.getElementById(i)}
+
+function mkItem(t,showDate){
+  var li=document.createElement("li");if(t.done)li.className="done";
+  var c=document.createElement("input");c.type="checkbox";c.checked=t.done;
+  c.onchange=function(){t.done=c.checked;save();render()};
+  var w=document.createElement("div");w.className="tx";
+  var s=document.createElement("span");s.textContent=t.text;w.appendChild(s);
+  if(showDate){
+    var b=document.createElement("button");var late=!t.done&&t.date<todayKey;
+    b.className="dl"+(late?" late":"");b.textContent=fmt(t.date)+(late?" · 已逾期":"");
+    b.onclick=function(){sel=t.date;var d=parse(t.date);view=new Date(d.getFullYear(),d.getMonth(),1);ov=null;render();window.scrollTo(0,0)};
+    w.appendChild(b);
+  }
+  var x=document.createElement("button");x.className="del";x.textContent="×";x.setAttribute("aria-label","刪除");
+  x.onclick=function(){todos=todos.filter(function(o){return o!==t});save();render()};
+  li.append(c,w,x);return li;
+}
+function renderCal(){
+  $("title").textContent=view.getFullYear()+" 年 "+(view.getMonth()+1)+" 月";
+  var g=$("grid");g.innerHTML="";
+  WD.forEach(function(w){var h=document.createElement("div");h.className="wd";h.textContent=w;if(w==="日"||w==="六")h.style.color="var(--hol)";g.appendChild(h)});
+  var start=new Date(view.getFullYear(),view.getMonth(),1-view.getDay());
+  for(var i=0;i<42;i++){
+    var d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i),k=key(d);
+    if(i>=35&&d.getMonth()!==view.getMonth())break;
+    var b=document.createElement("button");
+    b.className="day"+(d.getMonth()!==view.getMonth()?" out":"")+(k===todayKey?" today":"")+(k===sel?" sel":"")+(H[k]||d.getDay()===0||d.getDay()===6?" hol":"");
+    var n=document.createElement("div");n.className="n";n.textContent=d.getDate();b.appendChild(n);
+    if(H[k]){var l=document.createElement("div");l.className="hl"+(H[k]==="補假"?" mk":"");l.textContent=H[k];b.appendChild(l)}
+    var items=todos.filter(function(t){return t.date===k});
+    if(items.length){
+      var dots=document.createElement("div");dots.className="dots";
+      items.slice(0,3).forEach(function(t){var o=document.createElement("div");o.className="dot"+(t.done?" d":"");dots.appendChild(o)});
+      b.appendChild(dots);
+    }
+    (function(kk,dd){b.onclick=function(){sel=kk;if(dd.getMonth()!==view.getMonth())view=new Date(dd.getFullYear(),dd.getMonth(),1);render()}})(k,d);
+    g.appendChild(b);
+  }
+}
+function renderList(){
+  var d=parse(sel);
+  $("seltitle").innerHTML="";
+  $("seltitle").append((d.getMonth()+1)+" 月 "+d.getDate()+" 日（週"+WD[d.getDay()]+"）"+(sel===todayKey?" · 今天":""));
+  if(H[sel]){var sm=document.createElement("small");sm.textContent=" · "+H[sel];$("seltitle").appendChild(sm)}
+  var ul=$("list");ul.innerHTML="";
+  var items=todos.filter(function(t){return t.date===sel});
+  if(!items.length)ul.innerHTML='<div class="empty">這一天還沒有待辦事項</div>';
+  items.forEach(function(t){ul.appendChild(mkItem(t,false))});
+  var left=items.filter(function(t){return!t.done}).length;
+  $("foot").textContent=items.length?"這天還有 "+left+" 項未完成":"";
+}
+function renderOv(){
+  var done=ov==="done";
+  $("ovtitle").textContent=done?"已完成事項":"未完成事項";
+  var items=todos.filter(function(t){return t.done===done}).sort(function(a,b){return done?(a.date<b.date?1:-1):(a.date<b.date?-1:1)});
+  var ul=$("ovlist");ul.innerHTML="";
+  if(!items.length)ul.innerHTML='<div class="empty">'+(done?"還沒有完成的事項":"沒有未完成的事項")+'</div>';
+  items.forEach(function(t){ul.appendChild(mkItem(t,true))});
+}
+function render(){
+  var np=todos.filter(function(t){return!t.done}).length;
+  $("np").textContent=np;$("nd").textContent=todos.length-np;
+  $("sp").className=ov==="todo"?"on":"";$("sd").className=ov==="done"?"on":"";
+  $("calview").hidden=!!ov;$("ovview").hidden=!ov;
+  if(ov)renderOv();else{renderCal();renderList()}
+}
+function add(){
+  var i=$("in"),v=i.value.trim();
+  if(!v)return;
+  todos.push({text:v,done:false,date:sel});i.value="";save();render();i.focus();
+}
+$("add").onclick=add;
+$("in").onkeydown=function(e){if(e.key==="Enter")add()};
+$("prev").onclick=function(){view=new Date(view.getFullYear(),view.getMonth()-1,1);renderCal()};
+$("next").onclick=function(){view=new Date(view.getFullYear(),view.getMonth()+1,1);renderCal()};
+$("today").onclick=function(){sel=todayKey;view=new Date(now.getFullYear(),now.getMonth(),1);render()};
+$("sp").onclick=function(){ov=ov==="todo"?null:"todo";render();window.scrollTo(0,0)};
+$("sd").onclick=function(){ov=ov==="done"?null:"done";render();window.scrollTo(0,0)};
+$("back").onclick=function(){ov=null;render()};
+render();
+</script>
+</body>
+</html>
